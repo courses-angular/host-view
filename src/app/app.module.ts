@@ -3,14 +3,17 @@ import { NgModule } from '@angular/core';
 
 import { AppComponent } from './app.component';
 import { ChildComponent } from './child.component';
+import { WidgetComponent } from './widget.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    ChildComponent
+    ChildComponent,
+    WidgetComponent
   ],
   imports: [
     BrowserModule
+
   ],
   providers: [],
   bootstrap: [AppComponent]
