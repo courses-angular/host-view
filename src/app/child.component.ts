@@ -1,19 +1,18 @@
-import { Component, OnInit } from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit} from '@angular/core';
 
 @Component({
   selector: 'yl-child',
   template: `
     <p>
-      child works!
+    {{title}}
     </p>
   `,
-  styles: []
+  styles: [],
 })
-export class ChildComponent implements OnInit {
-
+export class ChildComponent   {
+  title = 'Child Component';
   constructor() { }
 
-  ngOnInit(): void {
-  }
+
 
 }

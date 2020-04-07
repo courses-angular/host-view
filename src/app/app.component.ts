@@ -1,7 +1,7 @@
 import {
     AfterViewInit,
     ChangeDetectionStrategy, ChangeDetectorRef,
-    Component, ComponentFactory, ComponentFactoryResolver, OnInit,
+    Component, ComponentFactory, ComponentFactoryResolver, ComponentRef, Injector, OnInit,
     TemplateRef,
     ViewChild,
     ViewContainerRef
@@ -27,14 +27,21 @@ export class AppComponent implements AfterViewInit, OnInit {
    @ViewChild('container',{read: ViewContainerRef}) container: ViewContainerRef
     private childFactory: ComponentFactory<ChildComponent>;
 
-    constructor(private componentFactoryResolver: ComponentFactoryResolver) {
+    constructor(private componentFactoryResolver: ComponentFactoryResolver,
+                private injector: Injector,
+                private cdr: ChangeDetectorRef) {
     }
     ngOnInit(): void {
      this.childFactory =  this.componentFactoryResolver.resolveComponentFactory(ChildComponent);
     }
 
     ngAfterViewInit(): void {
-       this.container.createComponent(this.childFactory);
+        const childComponent: ComponentRef<ChildComponent> = this.childFactory.create(this.injector);
+        console.log(childComponent);
+        childComponent.instance.title = 'Instance of child component';
+        this.container.insert(childComponent.hostView);
+       // this.container.createComponent(this.childFactory);
+        this.cdr.detectChanges();
 
     }
 }
