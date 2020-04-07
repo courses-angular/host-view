@@ -1,32 +1,93 @@
-import { Component } from '@angular/core';
+import {
+    AfterViewInit,
+    ChangeDetectionStrategy, ChangeDetectorRef,
+    Component,
+    TemplateRef,
+    ViewChild,
+    ViewContainerRef
+} from '@angular/core';
+
+interface IUserTemplateContext {
+    user: IUser;
+    isFirst: boolean;
+    isLast: boolean;
+    isEven: boolean;
+    isOdd: boolean;
+}
+
+interface IUser {
+    name: string;
+    email: string;
+}
 
 @Component({
-  selector: 'app-root',
-  template: `
-    <!--The content below is only a placeholder and can be replaced.-->
-    <div style="text-align:center" class="content">
-      <h1>
-        Welcome to {{title}}!
-      </h1>
-      <span style="display: block">{{ title }} app is running!</span>
-      <img width="300" alt="Angular Logo" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTAgMjUwIj4KICAgIDxwYXRoIGZpbGw9IiNERDAwMzEiIGQ9Ik0xMjUgMzBMMzEuOSA2My4ybDE0LjIgMTIzLjFMMTI1IDIzMGw3OC45LTQzLjcgMTQuMi0xMjMuMXoiIC8+CiAgICA8cGF0aCBmaWxsPSIjQzMwMDJGIiBkPSJNMTI1IDMwdjIyLjItLjFWMjMwbDc4LjktNDMuNyAxNC4yLTEyMy4xTDEyNSAzMHoiIC8+CiAgICA8cGF0aCAgZmlsbD0iI0ZGRkZGRiIgZD0iTTEyNSA1Mi4xTDY2LjggMTgyLjZoMjEuN2wxMS43LTI5LjJoNDkuNGwxMS43IDI5LjJIMTgzTDEyNSA1Mi4xem0xNyA4My4zaC0zNGwxNy00MC45IDE3IDQwLjl6IiAvPgogIDwvc3ZnPg==">
-    </div>
-    <h2>Here are some links to help you start: </h2>
-    <ul>
-      <li>
-        <h2><a target="_blank" rel="noopener" href="https://angular.io/tutorial">Tour of Heroes</a></h2>
-      </li>
-      <li>
-        <h2><a target="_blank" rel="noopener" href="https://angular.io/cli">CLI Documentation</a></h2>
-      </li>
-      <li>
-        <h2><a target="_blank" rel="noopener" href="https://blog.angular.io/">Angular blog</a></h2>
-      </li>
-    </ul>
-    
-  `,
-  styles: []
+    selector: 'app-root',
+    template: `
+        <h2>App work</h2>
+        <ng-container #container></ng-container>
+        <!--        <h2>Template Content</h2>-->
+        <ng-template #userTemplate
+                     let-user="user"
+                     let-isFirst="isFirst"
+                     let-isLast="isLast"
+                     let-isEven="isEven"
+                     let-isOdd="isOdd">
+
+            <div [ngClass]="{'first': isFirst,'last':isLast,'even': isEven,'odd': isOdd}">
+                <h2>{{user.name}}</h2>
+                <h3>{{user.email}}</h3>
+            </div>
+        </ng-template>
+        <!--        <div *ngFor="let user of users;index as i;template userTemplate"></div>-->
+
+    `,
+    styles: [
+            `
+            .first {
+                color: red;
+            }
+
+            .last {
+                color: green;
+            }
+          .even {
+            background: cornflowerblue;
+          }
+          .odd{
+            background: darkcyan;
+            color: #fff;
+          }
+        `
+    ],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AppComponent {
-  title = 'host-view';
+export class AppComponent implements AfterViewInit {
+    @ViewChild('container', {read: ViewContainerRef}) container: ViewContainerRef;
+    // @ViewChild(TemplateRef) template: TemplateRef<IUserTemplateContext>; if there's one <ng-template></ng-template> in page
+    @ViewChild('userTemplate') template: TemplateRef<IUserTemplateContext>;
+
+    users = [
+        {name: 'Nir', email: 'nir@gmail.com'},
+        {name: 'Alex', email: 'alex@gmail.com'},
+        {name: 'Yoav', email: 'yoav@gmail.com'}
+    ];
+
+    constructor(private cdr: ChangeDetectorRef) {
+    }
+
+    ngAfterViewInit(): void {
+        // const view: EmbeddedViewRef<any> = this.template.createEmbeddedView(null);
+        // this.container.insert(view);
+        // this.container.createEmbeddedView(this.template);
+        for (let i = 0; i < this.users.length; i++) {
+            this.container.createEmbeddedView(this.template, {
+                user: this.users[i],
+                isFirst: i === 0,
+                isLast: i === this.users.length - 1,
+                isEven: i % 2 !== 0,
+                isOdd: i % 2 === 0
+            });
+        }
+        this.cdr.detectChanges();
+    }
 }
